@@ -1,1 +1,59 @@
+name: TYRO KANJI
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build TYRO KANJI APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract TYRO KANJI project
+        run: |
+          mkdir -p extracted
+          unzip -q TYRO_KANJI_MASTER_PROJECT.zip -d extracted
+
+      - name: Locate Android project
+        run: |
+          echo "Searching for Android project..."
+          find extracted -maxdepth 5 -type f \
+            \( -name "settings.gradle.kts" -o -name "settings.gradle" \) \
+            -print
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Build TYRO KANJI APK
+        working-directory: extracted
+        run: |
+          gradle assembleDebug --stacktrace
+
+      - name: Find APK
+        run: |
+          echo "APK files found:"
+          find extracted -type f -name "*.apk" -print
+
+      - name: Upload TYRO KANJI APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TYRO-KANJI-APK
+          path: extracted/**/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
