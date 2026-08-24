@@ -18,7 +18,7 @@ jobs:
       - name: Extract TYRO KANJI project
         run: |
           mkdir -p extracted
-          unzip -q TYRO_KANJI_MASTER_PROJECT5.zip -d extracted
+          unzip -q TYRO_KANJI_MASTER_PROJECT_FIXED5.zip -d extracted
 
       - name: Locate Android project
         run: |
